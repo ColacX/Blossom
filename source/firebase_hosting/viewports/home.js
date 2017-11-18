@@ -4,6 +4,9 @@ angular.module("blossom").directive("viewportHome", [() => {
 		replace: true,
 		template: `
 <div class="viewport home">
+	<div class="lineChart">
+		<line-chart></line-chart>
+	</div>
 </div>
 `,
 
