@@ -10,27 +10,107 @@ function sigmoid(value) {
 
 /**
  * S'(x) = S(x)(1-S(x))
+ * Math trick. You can reuse the sigmoid value to compute the derivative super fast
  */
 function sigmoid_derivative(sigmoid_value) {
 	return sigmoid_value * (1 - sigmoid_value);
 }
 
-// for (var i = -6; i < +6; i += 0.1) {
-// 	console.log(i, sigmoid(i));
-// }
+angular.module("blossom").directive("sigmoidChart", [() => {
+	return {
+		restrict: "E",
+		replace: true,
+		template: `<canvas></canvas>`,
+		link: function ($scope, $element, $attributes, $controller) {
+			var context = $element[0].getContext("2d");
+			var label_data = [];
+			var sigmoid_data = [];
+			var sigmoid_derivative_data = [];
 
-// function sigmoid_derivative() {
-// }
+			for (var x = -6; x < 6; x += 1) {
+				label_data.push(x);
 
-// var prediction;
+				var s = sigmoid(x);
+				sigmoid_data.push(s);
+				sigmoid_derivative_data.push(sigmoid_derivative(s));
+			}
 
-// for (var i = 0; i < 50; i++) {
-// 	prediction = predict();
-// 	var prediction_error = answer - prediction;
-// 	var prediction_delta = prediction_error * sigmoid_derivative(prediction);
-// 	var weight_delta;
-// 	var weight = weight + weight_delta;
-// }
+			var chart = new Chart(context, {
+				type: "line",
+				data: {
+					labels: label_data,
+					datasets: [{
+						label: 'Sigmoid',
+						data: sigmoid_data,
+						backgroundColor: "#F86385",
+						fill: false
+					},
+					{
+						label: 'Sigmoid Derivative',
+						data: sigmoid_derivative_data,
+						backgroundColor: "#559BE9",
+						fill: false
+					}]
+				}
+			});
+		}
+	}
+}]);
 
-// console.log(prediction);
+angular.module("blossom").directive("predictionChart", [() => {
+	return {
+		restrict: "E",
+		replace: true,
+		template: `<canvas></canvas>`,
+		link: function ($scope, $element, $attributes, $controller) {
+			var context = $element[0].getContext("2d");
+			var label_data = [];
+			var prediction_data = [];
+			var weight_data = [];
+			var error_data = [];
 
+			var X = 5.1;
+			var Y = 29;
+			var W = 0.5;
+
+			for (var i = 0; i < 10; i++) {
+				var P = sigmoid(X * W);
+				var E = Y - P;
+				var D = E * sigmoid_derivative(P);
+				W = W + X * D;
+				console.log(P, E, W);
+				label_data.push(i);
+				weight_data.push(W);
+				prediction_data.push(P);
+				error_data.push(E);
+			}
+
+			var chart = new Chart(context, {
+				type: "line",
+				data: {
+					labels: label_data,
+					datasets: [
+						{
+							label: 'Prediction',
+							data: prediction_data,
+							backgroundColor: "#5BBEBE",
+							fill: false
+						},
+						{
+							label: 'Weight',
+							data: weight_data,
+							backgroundColor: "#559BE9",
+							fill: false
+						},
+						{
+							label: 'Error',
+							data: error_data,
+							backgroundColor: "#F86385",
+							fill: false
+						}
+					]
+				}
+			});
+		}
+	}
+}]);
