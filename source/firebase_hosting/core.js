@@ -16,13 +16,16 @@ function sigmoid_derivative(sigmoid_value) {
 	return sigmoid_value * (1 - sigmoid_value);
 }
 
-angular.module("blossom").directive("sigmoidChart", [() => {
+angular.module("blossom").directive("sigmoidSection", [() => {
 	return {
 		restrict: "E",
 		replace: true,
-		template: `<canvas></canvas>`,
+		template: `
+<div class="section">
+	<canvas></canvas>
+</div>`,
 		link: function ($scope, $element, $attributes, $controller) {
-			var context = $element[0].getContext("2d");
+			var context = $element.find("canvas")[0].getContext("2d");
 			var label_data = [];
 			var sigmoid_data = [];
 			var sigmoid_derivative_data = [];
@@ -57,13 +60,18 @@ angular.module("blossom").directive("sigmoidChart", [() => {
 	}
 }]);
 
-angular.module("blossom").directive("predictionChart", [() => {
+angular.module("blossom").directive("simpleSection", [() => {
 	return {
 		restrict: "E",
 		replace: true,
-		template: `<canvas></canvas>`,
+		template: `
+<div class="section">
+	<span>X:{{X}} Y:{{Y}}</span>
+	<canvas></canvas>
+</div>
+`,
 		link: function ($scope, $element, $attributes, $controller) {
-			var context = $element[0].getContext("2d");
+			var context = $element.find("canvas")[0].getContext("2d");
 			var label_data = [];
 			var prediction_data = [];
 			var weight_data = [];
@@ -72,6 +80,8 @@ angular.module("blossom").directive("predictionChart", [() => {
 			var X = 5.1;
 			var Y = 29;
 			var W = 0.5;
+			$scope.X = X;
+			$scope.Y = Y;
 
 			for (var i = 0; i < 10; i++) {
 				var P = sigmoid(X * W);

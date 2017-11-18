@@ -1,5 +1,10 @@
-.chart{
-	display: inline-block;
-	width: 500px;
-	height: 500px;
+* {
+	box-sizing: border-box;
+	padding: 0px;
+	margin: 0px;
+}
+
+.section{
+	height: 400px;
+	padding: 50px;
 }
