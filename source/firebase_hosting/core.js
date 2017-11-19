@@ -16,6 +16,55 @@ function sigmoid_derivative(sigmoid_value) {
 	return sigmoid_value * (1 - sigmoid_value);
 }
 
+/**
+ * Dot product
+ */
+function vector_dot(vector_a, vector_b) {
+	if (vector_a.length != vector_b.length) throw "vector length does not match";
+
+	var product = 0.0;
+	for (var i = 0; i < vector_a.length; i++) {
+		product += vector_a[i] * vector_b[i];
+	}
+	return product;
+}
+
+function vector_mul(vector_a, vector_b) {
+	if (vector_a.length != vector_b.length) throw "vector length does not match";
+
+	var result = [];
+	for (var i = 0; i < vector_a.length; i++) {
+		result.push(vector_a[i] * vector_b[i]);
+	}
+	return result;
+}
+
+function vector_add(vector_a, vector_b) {
+	if (vector_a.length != vector_b.length) throw "vector length does not match";
+
+	var result = [];
+	for (var i = 0; i < vector_a.length; i++) {
+		result.push(vector_a[i] + vector_b[i]);
+	}
+	return result;
+}
+
+function vector_add_value(vector, value) {
+	var result = [];
+	for (var i = 0; i < vector.length; i++) {
+		result.push(vector[i] + value);
+	}
+	return result;
+}
+
+function vector_mul_value(vector, value) {
+	var result = [];
+	for (var i = 0; i < vector.length; i++) {
+		result.push(vector[i] * value);
+	}
+	return result;
+}
+
 function chartOptions() {
 	return {
 		maintainAspectRatio: false,
@@ -26,6 +75,9 @@ function chartOptions() {
 				scaleLabel: {
 					display: true,
 					labelString: 'Iteration'
+				},
+				ticks: {
+					maxTicksLimit: 21
 				}
 			}],
 			yAxes: [{
@@ -90,7 +142,6 @@ angular.module("blossom").directive("simpleSection", [() => {
 		replace: true,
 		template: `
 <div class="section">
-	<span>X:{{X}} Y:{{Y}}</span>
 	<canvas></canvas>
 </div>
 `,
@@ -104,8 +155,6 @@ angular.module("blossom").directive("simpleSection", [() => {
 			var X = 5.1;
 			var Y = 0;
 			var W = 0.5;
-			$scope.X = X;
-			$scope.Y = Y;
 
 			for (var i = 0; i < 10; i++) {
 				var P = sigmoid(X * W);
@@ -166,17 +215,19 @@ angular.module("blossom").directive("complexSection", [() => {
 			var weight_data = [];
 			var error_data = [];
 
-			var X = 5.1;
-			var Y = 0;
-			var W = 0.5;
-			$scope.X = X;
-			$scope.Y = Y;
+			var A = [
+				[1, 1, 1, 1]
+			];
+			var B = [0];
+			var W = [
+				[0.5, 0.5, 0.5, 0.5]
+			];
 
-			for (var i = 0; i < 10; i++) {
-				var P = sigmoid(X * W);
-				var E = Y - P;
+			for (var i = 0; i < 50; i++) {
+				var P = sigmoid(vector_dot(A[0], W[0]));
+				var E = B[0] - P;
 				var D = E * sigmoid_derivative(P);
-				W = W + X * D;
+				W[0] = vector_add(W[0], vector_mul_value(A[0], D));
 
 				label_data.push(i);
 				weight_data.push(W);
@@ -193,12 +244,6 @@ angular.module("blossom").directive("complexSection", [() => {
 							label: 'Prediction',
 							data: prediction_data,
 							backgroundColor: "#5BBEBE",
-							fill: false
-						},
-						{
-							label: 'Weight',
-							data: weight_data,
-							backgroundColor: "#559BE9",
 							fill: false
 						},
 						{
