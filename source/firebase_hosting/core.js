@@ -219,13 +219,27 @@ angular.module("blossom").directive("complexSection", [() => {
 			var error_data = [[], []];
 			var iterations = 10000;
 
-			//todo add noise to inputs
-			//https://www.quora.com/Why-is-it-important-to-add-noise-to-the-inputs-of-a-neural-network
+			/**
+			 * Neurons should not have negative inputs and only fire in the positive range. 
+			 * To train on 0 input values we should add a base value to the inputs
+			 * TODO Noise should be added to the input to avoid over-fitting
+			 */
+			const BASE = 1;
 			var A = [
-				[0.0, 0.1, 0.1, 0.1],
-				[1.0, 1.0, 1.0, 1.0]
+				[0.0 + BASE, 1.0 + BASE, 0.0 + BASE, 0.0 + BASE],
+				[1.0 + BASE, 1.0 + BASE, 1.0 + BASE, 0.0 + BASE]
 			];
+
+			/**
+			 * The answer sheet must be 0 or 1
+			 * Meaning yes or no 100%
+			 */
 			var B = [0, 1];
+
+			/**
+			 * Weights must be between 0 and 1
+			 * Weights represent if the network should include the connection or not
+			 */
 			var W = [
 				[0.5, 0.5, 0.5, 0.5]
 			];
@@ -238,6 +252,8 @@ angular.module("blossom").directive("complexSection", [() => {
 				for (var ie = 0; ie < 2; ie++) {
 					var P = sigmoid(vector_dot(A[ie], W[0]));
 					var E = B[ie] - P;
+
+					/** */
 					W[0] = vector_add(W[0], vector_mul_value(A[ie], E * sigmoid_derivative(P)));
 
 					if (i % (iterations / 10) == 0) {
