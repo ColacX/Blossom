@@ -65,6 +65,10 @@ function vector_mul_value(vector, value) {
 	return result;
 }
 
+function noise() {
+	return (Math.random() - 0.5) * 0.1;
+}
+
 function chartOptions() {
 	return {
 		maintainAspectRatio: false,
@@ -211,14 +215,15 @@ angular.module("blossom").directive("complexSection", [() => {
 		link: function ($scope, $element, $attributes, $controller) {
 			var context = $element.find("canvas")[0].getContext("2d");
 			var label_data = [];
-			var perception_data = [];
 			var debug_data = [];
-			var error_data = [];
+			var error_data = [[], []];
 			var iterations = 10000;
 
+			//todo add noise to inputs
+			//https://www.quora.com/Why-is-it-important-to-add-noise-to-the-inputs-of-a-neural-network
 			var A = [
-				[0.1, 0.1, 0.1, 0.1],
-				[0.9, 0.9, 0.1, 0.9]
+				[0.0, 0.1, 0.1, 0.1],
+				[1.0, 1.0, 1.0, 1.0]
 			];
 			var B = [0, 1];
 			var W = [
@@ -226,17 +231,22 @@ angular.module("blossom").directive("complexSection", [() => {
 			];
 
 			for (var i = 0; i < iterations; i++) {
-				var P = sigmoid(vector_dot(A[0], W[0]));
-				var E = B[0] - P;
-				W[0] = vector_add(W[0], vector_mul_value(A[0], E * sigmoid_derivative(P)));
-
 				if (i % (iterations / 10) == 0) {
 					label_data.push(i);
-					debug_data.push(sigmoid_derivative(P));
-					perception_data.push(P);
-					error_data.push(E);
+				}
+
+				for (var ie = 0; ie < 2; ie++) {
+					var P = sigmoid(vector_dot(A[ie], W[0]));
+					var E = B[ie] - P;
+					W[0] = vector_add(W[0], vector_mul_value(A[ie], E * sigmoid_derivative(P)));
+
+					if (i % (iterations / 10) == 0) {
+						error_data[ie].push(E);
+					}
 				}
 			}
+
+			console.log(W);
 
 			var chart = new Chart(context, {
 				type: "line",
@@ -244,15 +254,15 @@ angular.module("blossom").directive("complexSection", [() => {
 					labels: label_data,
 					datasets: [
 						{
-							label: 'Perception',
-							data: perception_data,
-							backgroundColor: "#5BBEBE",
+							label: 'Error0',
+							data: error_data[0],
+							backgroundColor: "#F86385",
 							fill: false
 						},
 						{
-							label: 'Error',
-							data: error_data,
-							backgroundColor: "#F86385",
+							label: 'Error1',
+							data: error_data[1],
+							backgroundColor: "#5BBEBE",
 							fill: false
 						},
 						{
