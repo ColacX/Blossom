@@ -211,28 +211,31 @@ angular.module("blossom").directive("complexSection", [() => {
 		link: function ($scope, $element, $attributes, $controller) {
 			var context = $element.find("canvas")[0].getContext("2d");
 			var label_data = [];
-			var prediction_data = [];
-			var weight_data = [];
+			var perception_data = [];
+			var debug_data = [];
 			var error_data = [];
+			var iterations = 10000;
 
 			var A = [
-				[1, 1, 1, 1]
+				[0.1, 0.1, 0.1, 0.1],
+				[0.9, 0.9, 0.1, 0.9]
 			];
-			var B = [0];
+			var B = [0, 1];
 			var W = [
 				[0.5, 0.5, 0.5, 0.5]
 			];
 
-			for (var i = 0; i < 50; i++) {
+			for (var i = 0; i < iterations; i++) {
 				var P = sigmoid(vector_dot(A[0], W[0]));
 				var E = B[0] - P;
-				var D = E * sigmoid_derivative(P);
-				W[0] = vector_add(W[0], vector_mul_value(A[0], D));
+				W[0] = vector_add(W[0], vector_mul_value(A[0], E * sigmoid_derivative(P)));
 
-				label_data.push(i);
-				weight_data.push(W);
-				prediction_data.push(P);
-				error_data.push(E);
+				if (i % (iterations / 10) == 0) {
+					label_data.push(i);
+					debug_data.push(sigmoid_derivative(P));
+					perception_data.push(P);
+					error_data.push(E);
+				}
 			}
 
 			var chart = new Chart(context, {
@@ -241,8 +244,8 @@ angular.module("blossom").directive("complexSection", [() => {
 					labels: label_data,
 					datasets: [
 						{
-							label: 'Prediction',
-							data: prediction_data,
+							label: 'Perception',
+							data: perception_data,
 							backgroundColor: "#5BBEBE",
 							fill: false
 						},
@@ -250,6 +253,12 @@ angular.module("blossom").directive("complexSection", [() => {
 							label: 'Error',
 							data: error_data,
 							backgroundColor: "#F86385",
+							fill: false
+						},
+						{
+							label: 'Debug',
+							data: debug_data,
+							backgroundColor: "#559BE9",
 							fill: false
 						}
 					]
