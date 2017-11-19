@@ -16,6 +16,29 @@ function sigmoid_derivative(sigmoid_value) {
 	return sigmoid_value * (1 - sigmoid_value);
 }
 
+function chartOptions() {
+	return {
+		maintainAspectRatio: false,
+		responsive: true,
+		scales: {
+			xAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: 'Iteration'
+				}
+			}],
+			yAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: 'Value'
+				}
+			}]
+		}
+	};
+}
+
 angular.module("blossom").directive("sigmoidSection", [() => {
 	return {
 		restrict: "E",
@@ -54,7 +77,8 @@ angular.module("blossom").directive("sigmoidSection", [() => {
 						backgroundColor: "#559BE9",
 						fill: false
 					}]
-				}
+				},
+				options: chartOptions()
 			});
 		}
 	}
@@ -78,7 +102,7 @@ angular.module("blossom").directive("simpleSection", [() => {
 			var error_data = [];
 
 			var X = 5.1;
-			var Y = 29;
+			var Y = 0;
 			var W = 0.5;
 			$scope.X = X;
 			$scope.Y = Y;
@@ -88,7 +112,7 @@ angular.module("blossom").directive("simpleSection", [() => {
 				var E = Y - P;
 				var D = E * sigmoid_derivative(P);
 				W = W + X * D;
-				console.log(P, E, W);
+
 				label_data.push(i);
 				weight_data.push(W);
 				prediction_data.push(P);
@@ -119,7 +143,73 @@ angular.module("blossom").directive("simpleSection", [() => {
 							fill: false
 						}
 					]
-				}
+				},
+				options: chartOptions()
+			});
+		}
+	}
+}]);
+
+angular.module("blossom").directive("complexSection", [() => {
+	return {
+		restrict: "E",
+		replace: true,
+		template: `
+<div class="section">
+	<canvas></canvas>
+</div>
+`,
+		link: function ($scope, $element, $attributes, $controller) {
+			var context = $element.find("canvas")[0].getContext("2d");
+			var label_data = [];
+			var prediction_data = [];
+			var weight_data = [];
+			var error_data = [];
+
+			var X = 5.1;
+			var Y = 0;
+			var W = 0.5;
+			$scope.X = X;
+			$scope.Y = Y;
+
+			for (var i = 0; i < 10; i++) {
+				var P = sigmoid(X * W);
+				var E = Y - P;
+				var D = E * sigmoid_derivative(P);
+				W = W + X * D;
+
+				label_data.push(i);
+				weight_data.push(W);
+				prediction_data.push(P);
+				error_data.push(E);
+			}
+
+			var chart = new Chart(context, {
+				type: "line",
+				data: {
+					labels: label_data,
+					datasets: [
+						{
+							label: 'Prediction',
+							data: prediction_data,
+							backgroundColor: "#5BBEBE",
+							fill: false
+						},
+						{
+							label: 'Weight',
+							data: weight_data,
+							backgroundColor: "#559BE9",
+							fill: false
+						},
+						{
+							label: 'Error',
+							data: error_data,
+							backgroundColor: "#F86385",
+							fill: false
+						}
+					]
+				},
+				options: chartOptions()
 			});
 		}
 	}

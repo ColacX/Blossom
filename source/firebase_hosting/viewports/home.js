@@ -4,8 +4,9 @@ angular.module("blossom").directive("viewportHome", [() => {
 		replace: true,
 		template: `
 <div class="viewport home">
-	<sigmoid-section></sigmoid-section>
+	<complex-section></complex-section>
 	<simple-section></simple-section>
+	<sigmoid-section></sigmoid-section>
 </div>
 `,
 
