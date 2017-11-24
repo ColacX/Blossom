@@ -262,8 +262,6 @@ angular.module("blossom").directive("complexSection", [() => {
 				}
 			}
 
-			console.log(W);
-
 			var chart = new Chart(context, {
 				type: "line",
 				data: {
@@ -291,6 +289,105 @@ angular.module("blossom").directive("complexSection", [() => {
 				},
 				options: chartOptions()
 			});
+		}
+	}
+}]);
+
+angular.module("blossom").directive("multiLayerSection", [() => {
+	return {
+		restrict: "E",
+		replace: true,
+		template: `
+<div class="section">
+	<canvas></canvas>
+</div>
+`,
+		link: function ($scope, $element, $attributes, $controller) {
+			setTimeout(() => {
+				var context = $element.find("canvas")[0].getContext("2d");
+				var t = new Trainer();
+				var chart = new Chart(context, {
+					type: "line",
+					data: t.chartData(),
+					options: chartOptions()
+				});
+			}, 0);
+
+			class Trainer {
+				constructor() {
+					this.ITERATIONS = 100;
+					this.CONFIG = 100;
+					this.BASE = 1;
+
+					this.sets = []; //List of training sets
+					this.weights = [];
+
+					this.A_LENGTH = 4;
+					this.B_LENGTH = 1;
+
+					this.addSet([0, 0, 0, 0], [0]);
+					this.addSet([1, 1, 1, 1], [1]);
+				}
+
+				/**
+				 * All training sets must have the same dimensions
+				 */
+				addSet(a, b) {
+					if (a.length != this.A_LENGTH && b.length != this.B_LENGTH) throw "invalid dimensions";
+
+					this.adjustInput(a);
+					this.sets.push({
+						a: a, //input data
+						b: b //expected output data
+					});
+				}
+
+				adjustInput(input) {
+					for (var i = 0; i < input.length; i++) {
+						input[i] += this.BASE;
+					}
+				}
+
+				trainOnce(set) {
+					return 0.1;
+				}
+
+				isMilestone(i) {
+					return i % (this.ITERATIONS / 10) == 0;
+				}
+
+				chartData() {
+					var d = {};
+					d.labels = [];
+					d.datasets = [];
+
+					for (var is = 0; is < this.sets.length; is++) {
+						d.datasets.push({
+							label: "Error" + is,
+							data: [],
+							backgroundColor: "#" + (Math.round(0xFFFFFF / this.sets.length) * is).toString(16),
+							fill: false
+						});
+					};
+
+					for (var i = 0; i < this.ITERATIONS; i++) {
+						if (this.isMilestone(i)) {
+							d.labels.push(i);
+						}
+
+						for (var is = 0; is < this.sets.length; is++) {
+							var error = this.trainOnce(this.sets[is]);
+
+							if (this.isMilestone(i)) {
+								d.datasets[is].data.push(error);
+							}
+						}
+					}
+
+					console.log(d);
+					return d;
+				}
+			}
 		}
 	}
 }]);
