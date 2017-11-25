@@ -315,18 +315,46 @@ angular.module("blossom").directive("multiLayerSection", [() => {
 
 			class Trainer {
 				constructor() {
-					this.ITERATIONS = 100;
-					this.CONFIG = 100;
+					this.ITERATIONS = 1;
 					this.BASE = 1;
 
 					this.sets = []; //List of training sets
-					this.weights = [];
+					this.layerWeights = [];
 
 					this.A_LENGTH = 4;
 					this.B_LENGTH = 1;
 
 					this.addSet([0, 0, 0, 0], [0]);
 					this.addSet([1, 1, 1, 1], [1]);
+
+					this.addNeuron(0);
+					this.addNeuron(0);
+
+					this.addNeuron(1);
+				}
+
+				startValue() {
+					return 0.5;
+				}
+
+				layerLength(index) {
+					if (index < 0) {
+						return this.A_LENGTH;
+					}
+
+					return this.layerWeights[index].length;
+				}
+
+				addNeuron(layerIndex) {
+					var weights = [];
+					var length = this.layerLength(layerIndex - 1);
+
+					for (var i = 0; i < length; i++) {
+						weights.push(this.startValue());
+					}
+
+					if (!this.layerWeights[layerIndex]) this.layerWeights[layerIndex] = [];
+					this.layerWeights[layerIndex].push(weights);
 				}
 
 				/**
@@ -342,14 +370,80 @@ angular.module("blossom").directive("multiLayerSection", [() => {
 					});
 				}
 
+				/**
+				 * Adjust the input to avoid zero training
+				 */
 				adjustInput(input) {
 					for (var i = 0; i < input.length; i++) {
 						input[i] += this.BASE;
 					}
 				}
 
-				trainOnce(set) {
-					return 0.1;
+				getLayerValues(layerIndex) {
+					if (layerIndex < 0) return set.a;
+					return values[layerIndex];
+				}
+
+				computeLayer(layerIndex, layerResults) {
+					var result = []; //TODO
+					var inputs = layerResults[layerIndex];
+					var neuronCount = this.layerWeights[layerIndex].length;
+					//console.log("neuronCount", neuronCount);
+
+					for (var i = 0; i < neuronCount; i++) {
+						var weights = this.layerWeights[layerIndex][i];
+						var P = sigmoid(vector_dot(inputs, weights));
+						result.push(P); //TODO push P or binary 1 0?
+					}
+
+					layerResults.push(result); //TODO
+				}
+
+				updateLayer(layerIndex, layerResults) {
+					console.log("updateLayers", layerIndex, layerResults[layerIndex], this.layerWeights[layerIndex]);
+					var W = this.layerWeights[layerIndex];
+					var R = layerResults[layerIndex];
+
+					for (var i = 0; i < R.length; i++) {
+						var weights = W[i];
+						var P = R[i - 1];
+						var E = R[i] - P;
+						W[i] = vector_add(weights, vector_mul_value(weights, E * sigmoid_derivative(P)));
+					}
+				}
+
+				trainSetOnce(set) {
+					console.log("layerWeights", this.layerWeights);
+					var layerResults = [set.a.slice()]; //TODO
+
+					/**
+					 * forward propagation
+					 */
+					for (var i = 0; i < this.layerWeights.length; i++) {
+						this.computeLayer(i, layerResults);
+					}
+
+					/**
+					 * backward propagation
+					 */
+					layerResults.push(set.b.slice()); //TODO
+					console.log("layerResults", layerResults);
+
+					for (var i = this.layerWeights.length - 1; i >= 0; i--) {
+						this.updateLayer(i, layerResults);
+					}
+
+					console.log("layerWeights", this.layerWeights);
+
+					/**
+					 * compute the average error
+					 */
+					var error = 0;
+					var finalLayer = layerResults[layerResults.length];
+					for (var i = 0; i < set.b.length; i++) {
+						error += set.b[i] - finalLayer[i];
+					}
+					return error;
 				}
 
 				isMilestone(i) {
@@ -375,8 +469,8 @@ angular.module("blossom").directive("multiLayerSection", [() => {
 							d.labels.push(i);
 						}
 
-						for (var is = 0; is < this.sets.length; is++) {
-							var error = this.trainOnce(this.sets[is]);
+						for (var is = 0; is < 1; is++) {
+							var error = this.trainSetOnce(this.sets[is]);
 
 							if (this.isMilestone(i)) {
 								d.datasets[is].data.push(error);
