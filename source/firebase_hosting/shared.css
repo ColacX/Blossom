@@ -1,13 +1,33 @@
+/* global */
+
 * {
 	box-sizing: border-box;
 	padding: 0px;
 	margin: 0px;
 }
 
+/* useful */
+
 .viewport {
 	width: 100vw;
 	height: 100vh;
+	overflow: hidden;
 }
+
+.hidden {
+	display: none;
+}
+
+.maximized {
+	width: 100%;
+	height: 100%;
+}
+
+.scroll-auto {
+	overflow: auto;
+}
+
+/* section */
 
 .section {
 	height: 400px;

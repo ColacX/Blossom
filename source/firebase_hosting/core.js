@@ -10,10 +10,18 @@ angular.module("blossom").config(["$stateProvider", "$urlRouterProvider", ($stat
 	$stateProvider
 		.state("login", {
 			url: "/login",
-			template: "<viewport-login></viewport-login>"
+			views: {
+				"viewport": {
+					template: "<viewport-login></viewport-login>"
+				}
+			}
 		})
 		.state("home", {
 			url: "/home",
-			template: "<viewport-home></viewport-home>"
+			views: {
+				"viewport": {
+					template: "<viewport-home></viewport-home>"
+				}
+			}
 		})
 }]);

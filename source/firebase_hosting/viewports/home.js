@@ -3,11 +3,13 @@ angular.module("blossom").directive("viewportHome", [() => {
 		restrict: "E",
 		template: `
 <div class="viewport home">
-	<span ui-sref="login">home</span>
-	<multi-layer-section></multi-layer-section>
-	<complex-section></complex-section>
-	<simple-section></simple-section>
-	<sigmoid-section></sigmoid-section>
+	<div class="maximized scroll-auto">
+		<span ui-sref="login">home</span>
+		<multi-layer-section></multi-layer-section>
+		<complex-section></complex-section>
+		<simple-section></simple-section>
+		<sigmoid-section></sigmoid-section>
+	</div>
 </div>
 `,
 
