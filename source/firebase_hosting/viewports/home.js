@@ -1,9 +1,9 @@
 angular.module("blossom").directive("viewportHome", [() => {
 	return {
 		restrict: "E",
-		replace: true,
 		template: `
 <div class="viewport home">
+	<span ui-sref="login">home</span>
 	<multi-layer-section></multi-layer-section>
 	<complex-section></complex-section>
 	<simple-section></simple-section>
@@ -11,7 +11,7 @@ angular.module("blossom").directive("viewportHome", [() => {
 </div>
 `,
 
-		link: function ($scope, $element, $attributes, $controller) {
+		link: ($scope, $element, $attributes, $controller) => {
 		}
 	};
 }]);
