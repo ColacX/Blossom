@@ -1,7 +1,5 @@
-angular.module("blossom").directive("viewportHome", [() => {
-	return {
-		restrict: "E",
-		template: `
+angular.module("blossom").component("viewportHome", {
+	template: `
 <div class="viewport home">
 	<div class="maximized scroll-auto">
 		<span ui-sref="login">home</span>
@@ -11,9 +9,5 @@ angular.module("blossom").directive("viewportHome", [() => {
 		<sigmoid-section></sigmoid-section>
 	</div>
 </div>
-`,
-
-		link: ($scope, $element, $attributes, $controller) => {
-		}
-	};
-}]);
+`
+});
