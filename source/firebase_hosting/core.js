@@ -24,4 +24,12 @@ angular.module("blossom").config(["$stateProvider", "$urlRouterProvider", ($stat
 				}
 			}
 		})
+		.state("home.workspace", {
+			url: "/workspace",
+			views: {
+				"viewtab": {
+					template: "<p>tab workspace</p>"
+				}
+			}
+		})
 }]);
