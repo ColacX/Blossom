@@ -1,35 +1,26 @@
-angular.module("blossom", ["ui.router"]);
+angular.module("blossom", []);
 
-/**
- * https://ui-router.github.io/
- * https://stackoverflow.com/questions/25655246/is-html5-mode-url-routing-with-angularjs-possible-when-in-local-file-based-apps
- * https://scotch.io/tutorials/pretty-urls-in-angularjs-removing-the-hashtag
- */
-angular.module("blossom").config(["$stateProvider", "$urlRouterProvider", ($stateProvider, $urlRouterProvider) => {
-	$urlRouterProvider.otherwise("/login");
-	$stateProvider
-		.state("login", {
-			url: "/login",
-			views: {
-				"viewport": {
-					template: "<viewport-login></viewport-login>"
-				}
-			}
-		})
-		.state("home", {
-			url: "/home",
-			views: {
-				"viewport": {
-					template: "<viewport-home></viewport-home>"
-				}
-			}
-		})
-		.state("home.workspace", {
-			url: "/workspace",
-			views: {
-				"viewtab": {
-					template: "<p>tab workspace</p>"
-				}
-			}
-		})
-}]);
+angular.module("blossom").component("viewportRoot", {
+	template: `
+<div class="viewport root">
+	<view-login ng-if="view == 'view-login'"></view-login>
+	<view-home ng-if="view == 'view-home'"></view-home>
+</div>
+`,
+	controller: ($scope) => {
+		console.log(window.location);
+
+		switch (window.location.hash) {
+			case "#login":
+				$scope.view = "view-login";
+				break;
+			case "#home":
+				$scope.view = "view-home";
+				break;
+			default:
+				$scope.view = "view-login";
+		}
+
+		console.log($scope);
+	}
+});
