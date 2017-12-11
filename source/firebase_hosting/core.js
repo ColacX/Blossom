@@ -1,26 +1,49 @@
 angular.module("blossom", []);
 
-angular.module("blossom").component("viewportRoot", {
-	template: `
-<div class="viewport root">
-	<view-login ng-if="view == 'view-login'"></view-login>
-	<view-home ng-if="view == 'view-home'"></view-home>
+angular.module("blossom").directive("viewRouter", [() => {
+	return {
+		restrict: "A",
+		template: `
+<div class="viewRouter viewport">
+	<view-login ng-if="viewRouter.view == 'view-login'"></view-login>
+	<view-home ng-if="viewRouter.view == 'view-home'"></view-home>
 </div>
 `,
-	controller: ($scope) => {
-		console.log(window.location);
+		link: ($scope, $element, $attributes, $controller) => {
+			console.log("asds");
+			function ViewRouter() {
+				var self = this;
 
-		switch (window.location.hash) {
-			case "#login":
-				$scope.view = "view-login";
-				break;
-			case "#home":
-				$scope.view = "view-home";
-				break;
-			default:
-				$scope.view = "view-login";
+				self.switch = (hashRoute) => {
+					switch (hashRoute) {
+						case "#login":
+							self.view = "view-login";
+							break;
+						case "#home":
+							self.view = "view-home";
+							break;
+						default:
+							self.view = "view-login";
+					}
+				};
+
+				self.switch(window.location.hash);
+			}
+
+			$scope.viewRouter = new ViewRouter();
+			console.log($scope);
 		}
-
-		console.log($scope);
 	}
-});
+}]);
+
+angular.module("blossom").directive("vLink", [() => {
+	return {
+		restrict: "A",
+		link: ($scope, $element, $attributes, $controller) => {
+			$element.on("click", ($event) => {
+				//$scope.viewRouter.switch($attributes["vLink"]);
+				console.log($scope);
+			});
+		}
+	};
+}]);
