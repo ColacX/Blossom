@@ -104,13 +104,42 @@ class Network {
 	}
 
 	async train() {
-	}
-
-	async compute() {
 		//forward propagation
 		for (let layer of this.layers) {
 			for (let neuron of layer.neurons) {
 				neuron.compute();
+			}
+		}
+
+		/**
+		 * Compute the squared error function
+		 */
+		let outputLayer = this.layers[this.layers.length].neurons;
+		let totalError = 0.0;
+
+		for (let neuron of outputLayer) {
+			totalError += (target - neuron.output) * (target - neuron.output) * 0.5;
+		}
+
+		//backward propagation
+		for (let li = this.layers.length - 1; li > 0; li--) {
+			let layer = this.layers[li];
+
+			for (let neuron of layer.neurons) {
+				let gradientTotal = - (target - neuron.output);
+				let gradientNeuron = sigmoid_derivative(neuron.output);
+
+				for (let connection of neuron.connections) {
+					let gradientWeight = connection.neuron.output;
+
+					/**
+					 * Update weights
+					 * delta rule
+					 */
+					let learningRate = 1.0;
+					let chainRule = gradientNeuron * gradientWeight;
+					connection.weight += learningRate * gradientTotal * chainRule;
+				}
 			}
 		}
 	}
@@ -118,7 +147,7 @@ class Network {
 
 (async () => {
 	let network = new Network();
-	await network.load();
-	await network.compute();
+	//	await network.load();
+	//	await network.train();
 	console.log(network);
 })();
