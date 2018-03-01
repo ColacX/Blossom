@@ -109,42 +109,42 @@ hidden2.change = () => sigmoid_derivative(hidden2.out());
 
 weight1.net = () => input1.out();
 weight1.error = () => hidden1.error() * hidden1.change() * weight1.net();
-weight1.delta = () => weight1.value - learningRate * weight1.error();
+weight1.next = () => weight1.value - learningRate * weight1.error();
 
 weight2.net = () => input2.out();
 weight2.error = () => hidden1.error() * hidden1.change() * weight2.net();
-weight2.delta = () => weight2.value - learningRate * weight2.error();
+weight2.next = () => weight2.value - learningRate * weight2.error();
 
 weight3.net = () => input1.out();
 weight3.error = () => hidden2.error() * hidden2.change() * weight3.net();
-weight3.delta = () => weight3.value - learningRate * weight3.error();
+weight3.next = () => weight3.value - learningRate * weight3.error();
 
 weight4.net = () => input2.out();
 weight4.error = () => hidden2.error() * hidden2.change() * weight4.net();
-weight4.delta = () => weight4.value - learningRate * weight4.error();
+weight4.next = () => weight4.value - learningRate * weight4.error();
 
 weight5.net = () => hidden1.out();
 weight5.error = () => output1.error() * output1.change() * weight5.net();
-weight5.delta = () => weight5.value - learningRate * weight5.error();
+weight5.next = () => weight5.value - learningRate * weight5.error();
 
 weight6.net = () => hidden2.out();
 weight6.error = () => output1.error() * output1.change() * weight6.net();
-weight6.delta = () => weight6.value - learningRate * weight6.error();
+weight6.next = () => weight6.value - learningRate * weight6.error();
 
 weight7.net = () => hidden1.out();
 weight7.error = () => output2.error() * output2.change() * weight7.net();
-weight7.delta = () => weight7.value - learningRate * weight7.error();
+weight7.next = () => weight7.value - learningRate * weight7.error();
 
 weight8.net = () => hidden2.out();
 weight8.error = () => output2.error() * output2.change() * weight8.net();
-weight8.delta = () => weight8.value - learningRate * weight8.error();
+weight8.next = () => weight8.value - learningRate * weight8.error();
 
 console.log("nn.js");
-console.log("delta_w1", weight1.delta());
-console.log("delta_w2", weight2.delta());
-console.log("delta_w3", weight3.delta());
-console.log("delta_w4", weight4.delta());
-console.log("delta_w5", weight5.delta());
-console.log("delta_w6", weight6.delta());
-console.log("delta_w7", weight7.delta());
-console.log("delta_w8", weight8.delta());
+console.log("next_w1", weight1.next());
+console.log("next_w2", weight2.next());
+console.log("next_w3", weight3.next());
+console.log("next_w4", weight4.next());
+console.log("next_w5", weight5.next());
+console.log("next_w6", weight6.next());
+console.log("next_w7", weight7.next());
+console.log("next_w8", weight8.next());
