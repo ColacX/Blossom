@@ -35,6 +35,8 @@ let w8 = 0.55;
 let b1 = 0.35;
 let b2 = 0.60;
 
+console.log("example.js");
+
 let net_h1 = w1 * i1 + w2 * i2 + b1 * 1;
 let out_h1 = sigmoid(net_h1);
 
@@ -112,7 +114,7 @@ let delta_w2 = w2 - learningRate * e_total_gradient_w2;
  * h2
  */
 let net_o1_gradient_out_h2 = w6;
-let e_o1_gradient_out_h2 = e_o1_gradient_net_o1 * net_o1_gradient_out_h2;
+let e_o1_gradient_out_h2 = e_o1_gradient_net_o1 * net_o1_gradient_out_h2; //<----?
 
 let net_o2_gradient_out_h2 = w8;
 let e_o2_gradient_out_h2 = e_o2_gradient_net_o2 * net_o2_gradient_out_h2;
@@ -127,3 +129,12 @@ let delta_w3 = w3 - learningRate * e_total_gradient_w3;
 let net_h2_gradient_w4 = i2;
 let e_total_gradient_w4 = e_total_gradient_out_h2 * out_h2_gradient_net_h2 * net_h2_gradient_w4;
 let delta_w4 = w4 - learningRate * e_total_gradient_w4;
+
+console.log("delta_w1", delta_w1);
+console.log("delta_w2", delta_w2);
+console.log("delta_w3", delta_w3);
+console.log("delta_w4", delta_w4);
+console.log("delta_w5", delta_w5);
+console.log("delta_w6", delta_w6);
+console.log("delta_w7", delta_w7);
+console.log("delta_w8", delta_w8);

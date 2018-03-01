@@ -60,6 +60,11 @@ class Neuron {
 class Connection { }
 class Layer { }
 class Set { }
+class Weight {
+	constructor(value) {
+		this.value = value;
+	}
+}
 
 class Network {
 	constructor() {
@@ -126,14 +131,40 @@ class Network {
 
 		console.log(errorTotal);
 
-		//backward propagation
+		//backward propagation, recompute the weights
+		console.log("set", set);
+		console.log("outputLayer", this.outputLayer);
+		console.log(this.outputLayer.neurons[0].output - set.ideals[0]);
+		console.log(this.outputLayer.neurons[0].output * (1 - this.outputLayer.neurons[0].output));
+		console.log(this.hiddenLayers[0].neurons[0].output);
+
 		for (let i = this.hiddenLayers.length - 1; i >= 0; i--) {
 			let layer = this.hiddenLayers[i];
 
 			for (let neuron of layer.neurons) {
-
+				console.log(neuron);
 			}
 		}
+	}
+
+	updateWeight(weight) {
+		weight.value = weight.value - this.learningRate * this.partialDerivative_totalError_weight(weight);
+	}
+
+	partialDerivative_totalError_weight(weight) {
+		return this.partialDerivative_totalError_output(weight.outputNeuron) * this.partialDerivative_output_input(weight.outputNeuron) * this.partialDerivative_input_weight(weight);
+	}
+
+	partialDerivative_totalError_output(neuron) {
+		return
+	}
+
+	partialDerivative_output_input(neuron) {
+		return neuron.output * (1 - neuron.output);
+	}
+
+	partialDerivative_input_weight(weight) {
+		return weight.inputNeuron.output;
 	}
 }
 
