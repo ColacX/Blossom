@@ -133,10 +133,10 @@ computeWeight("w1");
 // console.log(N["o1"].out);
 // console.log(N["o2"].out);
 
-// console.log(N["o1"].error);
-// console.log(N["o2"].error);
-// console.log(N["h1"].error);
-// console.log(N["h2"].error);
+console.log(N["o1"].error);
+console.log(N["o2"].error);
+console.log(N["h1"].error);
+console.log(N["h2"].error);
 
 console.log(W["w8"].value);
 console.log(W["w7"].value);
