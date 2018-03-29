@@ -1,6 +1,6 @@
 {
-  "python.linting.enabled": false,
-  "python.formatting.provider": "pep8",
+  "python.linting.enabled": true,
+  "python.formatting.provider": "pycodestyle",
   "python.pythonPath": "/usr/local/bin/python3",
   "python.linting.pylintEnabled": true
 }
