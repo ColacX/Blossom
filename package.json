@@ -15,5 +15,8 @@
 	"bugs": {
 		"url": "https://github.com/ColacX/Blossom/issues"
 	},
-	"homepage": "https://github.com/ColacX/Blossom#readme"
+	"homepage": "https://github.com/ColacX/Blossom#readme",
+	"dependencies": {
+		"express": "^4.16.3"
+	}
 }

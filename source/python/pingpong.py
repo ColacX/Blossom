@@ -1,40 +1,43 @@
-
 # https://keras.io/#getting-started-30-seconds-to-keras
 
 from keras.models import Sequential
 from keras.layers import Dense, Flatten, Conv2D, MaxPooling2D, Dropout
-from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
+from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img, apply_transform
 from keras.optimizers import SGD, RMSprop
 import numpy
 import os
+import PIL
+from PIL import Image
 
-
-# https://stackoverflow.com/questions/43233169/keras-error-expected-dense-input-1-to-have-3-dimensions
-
+# https://www.tensorflow.org/api_docs/python/tf/keras/preprocessing/image/load_img
 def loadImage( name ):
   dirname = os.path.dirname(__file__)
-  filename = dirname + '/data/' + name
-  data = img_to_array(load_img(filename))
+  filename = dirname + '/data/pingpong/' + name
+  pilImage = load_img(filename)
+  scale = 4
+  pilImage = pilImage.resize( (round(640/scale), round(480/scale) ), PIL.Image.ANTIALIAS)
+  data = img_to_array(pilImage)
   return data
 
 # normalized feature input data
 X = [
-  loadImage('canvas0.png') / 255, 
-  loadImage('canvas1.png') / 255,
-  loadImage('canvas2.png') / 255,
-  loadImage('canvas3.png') / 255,
-  loadImage('canvas4.png') / 255,
-  loadImage('canvas5.png') / 255
+  loadImage('pingpong0.jpeg') / 255,
+  loadImage('pingpong1.jpeg') / 255,
+  loadImage('pingpong2.jpeg') / 255,
+  loadImage('pingpong3.jpeg') / 255,
+  loadImage('pingpong4.jpeg') / 255,
+  loadImage('pingpong5.jpeg') / 255
 ]
+
 
 # normalized output data
 Y = [
-  [1, 0, 0, 0, 0, 0],
-  [0, 1, 0, 0, 0, 0],
-  [0, 0, 1, 0, 0, 0],
-  [0, 0, 0, 1, 0, 0],
-  [0, 0, 0, 0, 1, 0],
-  [0, 0, 0, 0, 0, 1]
+  [1, 0, 0],
+  [1, 0, 0],
+  [0, 1, 1],
+  [0, 1, 0],
+  [0, 0, 1],
+  [0, 0, 1]
 ]
 
 X = numpy.array(X)
@@ -56,10 +59,10 @@ model.compile(loss='categorical_crossentropy',
               optimizer='adam',
               metrics=['accuracy'])
 
-model.fit(x=X, y=Y, epochs=100, batch_size=batchSize, verbose=1)
+print('training...')
+model.fit(x=X, y=Y, epochs=30, batch_size=batchSize, verbose=1)
 
 model.summary()
-
 #print('X', X)
 print('X.shape', X.shape)
 #print('Y', Y)
