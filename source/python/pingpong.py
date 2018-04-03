@@ -40,7 +40,7 @@ Y = [
   [0, 0, 1]
 ]
 
-X = numpy.array(X)
+X = numpy.array(X).reshape(6, 120*160*3)
 Y = numpy.array(Y)
 inputShape = X[0].shape
 outputShape = len(Y[0])
@@ -61,6 +61,8 @@ model.compile(loss='categorical_crossentropy',
 
 print('training...')
 model.fit(x=X, y=Y, epochs=30, batch_size=batchSize, verbose=1)
+
+model.save('kerasModel.h5')
 
 model.summary()
 #print('X', X)

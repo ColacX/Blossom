@@ -12,7 +12,8 @@
       </a>
       <input id="myX" type="text" />
       <input id="myY" type="text" />
-      <button onclick="paintButton()">Paint</button>
+      <button onclick="predictButton()">Predict</button>
+      <span id="predictText"></span>
     </div>
 
     <video id="myVideo" autoplay></video>
@@ -20,6 +21,7 @@
 
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://unpkg.com/keras-js"></script>
   <script src="/pingpong.js"></script>
 </body>
 
