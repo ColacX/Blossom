@@ -70,7 +70,7 @@ async function predictKeras() {
     console.log(inputData);
     const outputData = await model.predict(inputData)
     console.log('outputData', outputData);
-    $('#predictText').text('Blue:' + outputData.output[0] + ' Orange:' + outputData.output[1] + ' White:' + outputData.output[2]);
+    $('#predictText').text('Blue:' + outputData.output[0].toFixed(2) + ' Orange:' + outputData.output[1].toFixed(2) + ' White:' + outputData.output[2].toFixed(2));
   }
   catch (e) {
     console.error(e);
