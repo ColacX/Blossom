@@ -8,6 +8,7 @@ import numpy
 import os
 import sys
 import json
+from datetime import datetime
 
 # https://stackoverflow.com/questions/43233169/keras-error-expected-dense-input-1-to-have-3-dimensions
 def loadImage( filename ):
@@ -16,6 +17,7 @@ def loadImage( filename ):
   return data
 
 def train():
+  start = datetime.now()
   X = []
   Y = []
 
@@ -41,7 +43,12 @@ def train():
   model = Sequential()
 
   # https://www.learnopencv.com/image-classification-using-convolutional-neural-networks-in-keras/
-  model.add(Conv2D(filters = 64, kernel_size = (3, 3), activation='relu', input_shape=inputShape))
+
+  # https://www.quora.com/What-is-max-pooling-in-convolutional-neural-networks
+  # max pooling downsamples the image(w,h) but also picks the max value in the grid
+
+  model.add(MaxPooling2D(pool_size = (4, 4), input_shape=inputShape))
+  model.add(Conv2D(filters = 64, kernel_size = (3, 3), activation='relu'))
   model.add(MaxPooling2D(pool_size = (2, 2)))
   model.add(Conv2D(filters = 64, kernel_size = (3, 3), activation='relu'))
   model.add(MaxPooling2D(pool_size = (2, 2)))
@@ -53,7 +60,7 @@ def train():
                 metrics=['accuracy'])
 
   model.fit(x=X, y=Y, epochs=20, batch_size=batchSize, verbose=1)
-  model.save('classify.h5')
+  model.save('./data/classify.h5')
 
   #model.summary()
   #print('X', X)
@@ -65,13 +72,15 @@ def train():
   print('batchSize', batchSize)
   #print('evaluate', model.evaluate(X, Y))
   #print('predict', model.predict(X))
-  #print('predict', model.predict(X).round(3))
+  print('predict', model.predict(X).round(3))
+  end = datetime.now()
+  print(str(end - start))
 
 def predict():
-  model = load_model('./classify.h5')
+  model = load_model('./data/classify.h5')
   X = [loadImage('./data/predict.jpeg')]
   X = numpy.array(X)
-  print(json.loads(json.dumps(model.predict(X).round(3).tolist())))
+  print(json.loads(json.dumps(model.predict(X).tolist())))
   sys.stdout.flush()
   sys.stderr.flush()
 
