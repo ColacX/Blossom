@@ -1,0 +1,150 @@
+<html>
+
+<head>
+  <style>
+    .myCell {
+      display: block;
+    }
+
+    .myCell input {
+      display: none;
+    }
+
+    .myCell input:checked+canvas {
+      filter: invert(100%);
+    }
+
+    .myTable {
+      border-spacing: 0;
+      border-collapse: collapse;
+    }
+
+    .myTable td {
+      padding: 0px;
+    }
+
+    .myMark {
+      filter: invert(100%);
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <div>
+      <span>classygrid</span>
+      <button onclick="captureButton()">Capture</button>
+      <a id="downloadLink" download="Capture.jpeg" href="#">
+        <button>Download</button>
+      </a>
+      <button onclick="predictButton()">Predict</button>
+      <span id="predictText"></span>
+      <input id="categoryInput" value="default" />
+      <button onclick="uploadButton()">Upload</button>
+    </div>
+
+    <video id="myVideo" autoplay></video>
+    <canvas id="myCanvas"></canvas>
+    <div id="myGrid"></div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+    const cellSize = 32;
+
+    navigator.getUserMedia(
+      {
+        video: {
+          mandatory: {
+            minWidth: 640,
+            minHeight: 480
+          }
+        },
+        audio: false
+      },
+      (localMediaStream) => {
+
+        var videoElement = $("#myVideo")[0];
+        videoElement.src = window.URL.createObjectURL(localMediaStream);
+        videoElement.muted = true;
+        videoElement.onloadedmetadata = (e) => {
+          console.log(e);
+        };
+
+      },
+      (e) => {
+        console.error("video and audio failed", e);
+      }
+    );
+
+    function captureButton() {
+      let videoElement = $("#myVideo")[0];
+      let table = $('<table class="myTable"></table>');
+
+      for (let h = 0; h < videoElement.offsetHeight / cellSize; h++) {
+        let tr = $('<tr></tr>');
+
+        for (let w = 0; w < videoElement.offsetWidth / cellSize; w++) {
+          let td = $('<td></td>');
+          let label = $(`<label class="myCell" id="${w}:${h}"><input type="checkbox"></input></label>`)
+          let canvas = $('<canvas></canvas>');
+          canvas[0].width = cellSize;
+          canvas[0].height = cellSize;
+          canvas[0].getContext("2d").drawImage(videoElement, w * cellSize, h * cellSize, cellSize, cellSize, 0, 0, cellSize, cellSize);
+          label.append(canvas);
+          td.append(label);
+          tr.append(td);
+        }
+
+        table.append(tr);
+      }
+
+      $("#myGrid").html(table);
+    }
+
+    function predictButton() {
+      let url = `/classygrid/predict`;
+      $.ajax({
+        method: "DELETE",
+        url: url,
+        cache: false
+      }).then(() => {
+        $(".myCell input:checked+canvas").each((index, element) => {
+          const canvas = element;
+          canvas.toBlob((blob) => {
+            const category = $('#categoryInput').val();
+            var request = new XMLHttpRequest();
+            request.open("POST", url, true);
+            request.onreadystatechange = function () {
+              if (request.readyState === 4) {
+                console.log(request.response);
+                let j = JSON.parse(request.response);
+
+                if (j[0][0] > 0.9) {
+                  element.classList.add("myMark");
+                }
+              }
+            }
+            request.send(blob);
+          }, 'image/jpeg');
+        });
+
+        $(".myCell input").prop("checked", false);
+      });
+    }
+
+    function uploadButton() {
+      $(".myCell input:checked+canvas").each((index, element) => {
+        const canvas = element;
+        canvas.toBlob((blob) => {
+          const category = $('#categoryInput').val();
+          var request = new XMLHttpRequest();
+          request.open("POST", `/classygrid/upload/${category}`, true);
+          request.send(blob);
+        }, 'image/jpeg');
+      });
+
+    }
+  </script>
+</body>
+
+</html>
