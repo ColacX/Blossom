@@ -34,11 +34,7 @@
     <div>
       <span>classygrid</span>
       <button onclick="captureButton()">Capture</button>
-      <a id="downloadLink" download="Capture.jpeg" href="#">
-        <button>Download</button>
-      </a>
       <button onclick="predictButton()">Predict</button>
-      <span id="predictText"></span>
       <input id="categoryInput" value="default" />
       <button onclick="uploadButton()">Upload</button>
     </div>
@@ -48,6 +44,7 @@
     <div id="myGrid"></div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://unpkg.com/keras-js"></script>
   <script>
     const cellSize = 32;
 
@@ -101,7 +98,7 @@
       $("#myGrid").html(table);
     }
 
-    function predictButton() {
+    function predictRequest() {
       let url = `/classygrid/predict`;
       $.ajax({
         method: "DELETE",
@@ -132,6 +129,11 @@
       });
     }
 
+    function predictButton() {
+      //predictRequest();
+      predictKeras();
+    }
+
     function uploadButton() {
       $(".myCell input:checked+canvas").each((index, element) => {
         const canvas = element;
@@ -143,6 +145,70 @@
         }, 'image/jpeg');
       });
 
+    }
+
+    function rgbData(rgba) {
+      let rgb = new Float32Array(cellSize * cellSize * 3);
+      let next = 0;
+      for (let i = 0; i < rgba.length; i += 4) {
+        //normalize data
+        rgb[next++] = rgba[i + 0] / 255.0;
+        rgb[next++] = rgba[i + 1] / 255.0;
+        rgb[next++] = rgba[i + 2] / 255.0;
+        //skip alpha
+      }
+
+      return rgb;
+    }
+
+    let kerasModel = null;
+    async function loadKeras() {
+      try {
+        // https://transcranial.github.io/keras-js-docs/conversion/
+        // encoder.py is included in the kerasjs repo
+        kerasModel = new KerasJS.Model({
+          gpu: true,
+          filepath: 'data/classygrid/classygrid.bin',
+          filesystem: false
+        });
+
+        await kerasModel.ready();
+        console.log("model ready");
+      }
+      catch (e) {
+        console.error(e);
+      }
+    }
+    loadKeras();
+
+    async function pcanvas() {
+
+    }
+
+    async function predictKeras() {
+      let list = $(".myCell canvas");
+      $(".myCell input").prop("checked", false);
+      $(".myCell canvas").removeClass("myMark");
+      await kerasModel.ready();
+
+      for (let i = 0; i < list.length; i++) {
+        if (i % 10 == 0) {
+          console.log(i + " / " + list.length);
+        }
+
+        let canvas = list[i];
+        let rgba = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+        let rgb = rgbData(rgba.data);
+        const outputData = await kerasModel.predict({
+          input: rgb
+        });
+
+        if (outputData.output[0] > 0.9) {
+          canvas.classList.add("myMark");
+        }
+
+
+      };
     }
   </script>
 </body>

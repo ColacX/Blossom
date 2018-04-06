@@ -9,8 +9,9 @@ import os
 import sys
 import json
 from datetime import datetime
+from subprocess import call
 
-modelPath = './data/classygrid/classify.h5'
+modelPath = './data/classygrid/classygrid.h5'
 
 # https://stackoverflow.com/questions/43233169/keras-error-expected-dense-input-1-to-have-3-dimensions
 def loadImage( filename ):

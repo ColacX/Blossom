@@ -1,3 +1,5 @@
 /source/firebase_functions/node_modules
 node_modules/
 source/express/data/
+source/express/python/kerasjs/__pycache__/model_pb2.cpython-36.pyc
+source/python/kerasjs/__pycache__/model_pb2.cpython-36.pyc
