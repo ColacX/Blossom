@@ -11,7 +11,7 @@
     }
 
     .myCell input:checked+canvas {
-      filter: invert(100%);
+      filter: blur(2px);
     }
 
     .myTable {
@@ -185,7 +185,11 @@
       let list = $(".myCell canvas");
       $(".myCell input").prop("checked", false);
       $(".myCell canvas").removeClass("myMark");
+      $(".myCell canvas").prop("title", "");
       await kerasModel.ready();
+
+      // title names come from the data folder classes
+      let titles = ["ball", "cup", "default"];
 
       for (let i = 0; i < list.length; i++) {
         if (i % 10 == 0) {
@@ -201,11 +205,12 @@
           input: rgb
         });
 
-        if (outputData.output[0] > 0.9) {
-          canvas.classList.add("myMark");
+        for (let it = 0; it < outputData.output.length; it++) {
+          if (outputData.output[it] > 0.9) {
+            canvas.title = titles[it];
+            if (canvas.title != "default") canvas.classList.add("myMark");
+          }
         }
-
-
       };
     }
   </script>
