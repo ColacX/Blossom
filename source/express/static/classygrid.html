@@ -181,10 +181,6 @@
     }
     loadKeras();
 
-    async function pcanvas() {
-
-    }
-
     async function predictKeras() {
       let list = $(".myCell canvas");
       $(".myCell input").prop("checked", false);
@@ -199,6 +195,8 @@
         let canvas = list[i];
         let rgba = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
         let rgb = rgbData(rgba.data);
+
+        // predict does not support parallel requests and must be called synchronously
         const outputData = await kerasModel.predict({
           input: rgb
         });
