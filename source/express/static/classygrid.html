@@ -161,19 +161,20 @@
       return rgb;
     }
 
-    let kerasModel = null;
+    let kerasModel = [];
     async function loadKeras() {
       try {
         // https://transcranial.github.io/keras-js-docs/conversion/
         // encoder.py is included in the kerasjs repo
-        kerasModel = new KerasJS.Model({
-          gpu: true,
-          filepath: 'data/classygrid/classygrid.bin',
-          filesystem: false
-        });
 
-        await kerasModel.ready();
-        console.log("model ready");
+        for (let i = 0; i < 1; i++) {
+          kerasModel[i] = new KerasJS.Model({
+            gpu: false,
+            filepath: 'data/classygrid/classygrid.bin',
+            filesystem: false
+          });
+        }
+
       }
       catch (e) {
         console.error(e);
@@ -182,36 +183,47 @@
     loadKeras();
 
     async function predictKeras() {
+      let startTime = new Date();
+
       let list = $(".myCell canvas");
       $(".myCell input").prop("checked", false);
       $(".myCell canvas").removeClass("myMark");
       $(".myCell canvas").prop("title", "");
-      await kerasModel.ready();
 
       // title names come from the data folder classes
-      let titles = ["ball", "cup", "default"];
+      let titles = ["ball", "cup", "default", "rick"];
+      let promises = [];
 
-      for (let i = 0; i < list.length; i++) {
-        if (i % 10 == 0) {
-          console.log(i + " / " + list.length);
-        }
+      for (let ki = 0; ki < kerasModel.length; ki++) {
+        promises.push((async () => {
+          for (let li = ki * list.length / kerasModel.length; li < (ki + 1) * list.length / kerasModel.length; li++) {
 
-        let canvas = list[i];
-        let rgba = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
-        let rgb = rgbData(rgba.data);
+            let canvas = list[li];
+            let rgba = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+            let rgb = rgbData(rgba.data);
 
-        // predict does not support parallel requests and must be called synchronously
-        const outputData = await kerasModel.predict({
-          input: rgb
-        });
+            // predict does not support parallel requests and must be called synchronously
+            let km = kerasModel[ki];
+            console.log(li, ki);
+            await km.ready();
+            const outputData = await km.predict({
+              input: rgb
+            });
 
-        for (let it = 0; it < outputData.output.length; it++) {
-          if (outputData.output[it] > 0.9) {
-            canvas.title = titles[it];
-            if (canvas.title != "default") canvas.classList.add("myMark");
+            for (let it = 0; it < outputData.output.length; it++) {
+              if (outputData.output[it] > 0.9) {
+                canvas.title = titles[it];
+                if (canvas.title != "default") canvas.classList.add("myMark");
+              }
+            }
           }
-        }
-      };
+        })());
+
+      }
+      console.log(promises);
+      await Promise.all(promises);
+      let endTime = new Date();
+      console.log("elapsed ms", endTime - startTime);
     }
   </script>
 </body>
